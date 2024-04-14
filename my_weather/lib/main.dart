@@ -1,88 +1,138 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get_it/get_it.dart';
+import 'package:my_weather/services/auth.service.dart';
 import 'package:my_weather/services/dependencies_module.dart';
-import 'dart:convert';
+import 'package:my_weather/services/weather.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
-  setupDependencies();
+void main() async {
+  await setupDependencies();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final prefs = getIt<SharedPreferences>();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather App',
+      title: 'My Weather App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AuthWrapper(),
+      home: LoginScreen(),
     );
   }
 }
 
 class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+  const AuthWrapper({Key? key}) : super(key: key);
 
   @override
   AuthWrapperState createState() => AuthWrapperState();
 }
 
 class AuthWrapperState extends State<AuthWrapper> {
+  final AuthService authService = GetIt.instance<AuthService>();
   bool isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    setupSharedPreferences();
   }
 
-  Future<void> checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
+  Future<void> setupSharedPreferences() async {
+    final isLoggedIn = await authService.checkLoginStatus();
     setState(() {
-      isLoggedIn = token != null;
+      this.isLoggedIn = isLoggedIn;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoggedIn ? const WeatherScreen() : const LoginScreen();
+    return isLoggedIn ? WeatherScreen() : LoginScreen();
   }
 }
 
 class WeatherScreen extends StatelessWidget {
-  const WeatherScreen({super.key});
+  WeatherScreen();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weather App')),
+      appBar: AppBar(
+        title: const Text('My Weather App'),
+        backgroundColor: Colors.blue,
+      ),
       body: Center(
         child: FutureBuilder<Map<String, dynamic>>(
-          future: fetchWeatherData(),
+          future: GetIt.instance<WeatherService>().fetchWeatherData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator(
+                color: Colors.blue,
+              );
             } else if (snapshot.hasError) {
-              return const Text('Error loading weather data');
+              return const Text(
+                'Error loading weather data',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.red,
+                ),
+              );
             } else {
+              final currentTemperature =
+                  snapshot.data?['current']['temperature_2m'];
+              final windSpeed = snapshot.data?['current']['wind_speed_10m'];
+
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     'Current Weather',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    '${snapshot.data?['current']['temp']}°C',
-                    style: const TextStyle(fontSize: 36),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const FaIcon(
+                        FontAwesomeIcons.thermometer,
+                        size: 24,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$currentTemperature°C',
+                        style: TextStyle(
+                          fontSize: 36,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    snapshot.data?['current']['weather'][0]['description'],
-                    style: const TextStyle(fontSize: 18),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const FaIcon(
+                        FontAwesomeIcons.wind,
+                        size: 24,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Wind speed: $windSpeed km/h',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
@@ -92,29 +142,80 @@ class WeatherScreen extends StatelessWidget {
       ),
     );
   }
-
-  Future<Map<String, dynamic>> fetchWeatherData() async {
-    const apiKey = 'API_KEY';
-    final response = await http.get(Uri.parse(
-        'https://api.openweathermap.org/data/2.5/onecall?lat=YOUR_LATITUDE&lon=YOUR_LONGITUDE&exclude=minutely,hourly,daily&appid=$apiKey'));
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load weather data');
-    }
-  }
 }
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final AuthService authService = GetIt.instance<AuthService>();
+
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _usernameController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
-      body: const Center(
-        child: Text('Login screen goes here'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wb_sunny,
+              size: 64,
+              color: Colors.yellow,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Welcome to My Weather Login!',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Please enter your credentials to continue.',
+              style: TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: 200,
+              child: TextFormField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  prefixIcon: Icon(Icons.person),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: 200,
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                final success = await authService.login(
+                    _usernameController.text, _passwordController.text);
+                if (success) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => WeatherScreen()),
+                  );
+                } else {
+                  print('Invalid username or password');
+                }
+              },
+              child: Text('Login'),
+            ),
+          ],
+        ),
       ),
     );
   }

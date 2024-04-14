@@ -1,5 +1,4 @@
 import 'package:http/http.dart' as http;
-import 'package:get_it/get_it.dart';
 
 class IpService {
   final http.Client _httpClient;
