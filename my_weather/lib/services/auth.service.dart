@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   Future<bool> login(String username, String password) async {
-    if (username == 'Olly Olly' && password == '123456') {
+    if (username != '' && password != '') {
       final prefs = GetIt.instance<SharedPreferences>();
       await prefs.setString('auth_token', 'your_token_here');
       return true;
