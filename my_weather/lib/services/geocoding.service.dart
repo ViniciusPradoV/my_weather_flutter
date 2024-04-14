@@ -13,9 +13,7 @@ class GeocodingService extends GeocodingPlatform {
     try {
       final approximateCoordinates = await getApproximateCoordinates(ipAddress);
 
-      final refinedCoordinates = null;
-      
-      return refinedCoordinates ?? approximateCoordinates;
+      return approximateCoordinates;
     } catch (e) {
       print('Error fetching coordinates: $e');
       return null;
@@ -24,7 +22,7 @@ class GeocodingService extends GeocodingPlatform {
 
   Future<LatLng?> getApproximateCoordinates(String ipAddress) async {
     try {
-      final apiKey = '2c5525575c1946ad9fad47e296e71bb4';
+      const apiKey = '2c5525575c1946ad9fad47e296e71bb4';
       final response = await http.get(Uri.parse(
           'https://api.ipgeolocation.io/ipgeo?apiKey=$apiKey&ip=$ipAddress'));
 

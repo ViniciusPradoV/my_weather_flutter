@@ -23,7 +23,7 @@ class WeatherService {
         final longitude = data['longitude'] as double;
 
         final weatherResponse = await http.get(Uri.parse(
-            'https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m'));
+            'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,wind_speed_10m,relative_humidity_2m'));
 
         if (weatherResponse.statusCode == 200) {
           return json.decode(weatherResponse.body);
