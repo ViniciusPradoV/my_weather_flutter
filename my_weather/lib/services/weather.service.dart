@@ -10,13 +10,10 @@ class WeatherService {
     final latitude = data['latitude'] as double;
     final longitude = data['longitude'] as double;
 
-    print(data);
-
     final weatherResponse = await _httpClient.get(Uri.parse(
         'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,wind_speed_10m,relative_humidity_2m,precipitation,rain&forecast_days=1'));
 
     if (weatherResponse.statusCode == 200) {
-      print('Decoded data: ${json.decode(weatherResponse.body)}');
       return json.decode(weatherResponse.body);
     } else {
       throw Exception('Failed to load weather data');
