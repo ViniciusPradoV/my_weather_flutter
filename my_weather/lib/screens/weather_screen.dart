@@ -35,8 +35,8 @@ class _WeatherScreenState extends State<WeatherScreen> {
   Future<Map<String, dynamic>> _fetchWeatherData() async {
     final weatherService = GetIt.instance<WeatherService>();
     try {
-      while (location.isEmpty) {
-        await Future.delayed(const Duration(seconds: 1));
+      if (location.isEmpty) {
+        await Future.delayed(const Duration(seconds: 5));
       }
       final weatherData = await weatherService.fetchWeatherData(location);
       return weatherData;
