@@ -19,7 +19,7 @@ Future<void> setupDependencies() async {
     getIt.registerSingleton<AuthService>(AuthService());
     getIt.registerSingleton<IpService>(IpService(http.Client()));
     getIt.registerSingleton<GeocodingService>(GeocodingService());
-    getIt.registerSingleton<WeatherService>(WeatherService());
+    getIt.registerSingleton<WeatherService>(WeatherService(http.Client()));
   } catch (e) {
     print('Error initializing dependencies: $e');
   }
