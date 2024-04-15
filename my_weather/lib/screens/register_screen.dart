@@ -98,6 +98,8 @@ class RegisterScreen extends StatelessWidget {
                   msg: 'User registered with success!',
                   toastLength: Toast.LENGTH_LONG,
                   gravity: ToastGravity.BOTTOM,
+                  webBgColor: 'RGB(0, 255, 0)',
+                  backgroundColor: Colors.green,
                 );
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
