@@ -20,7 +20,6 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchIpAddressAndLocation();
   }
 
   Future<void> _fetchIpAddressAndLocation() async {
@@ -29,15 +28,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
     ipAddress = await ipService.getUserIpAddress();
     location = await geocodingService.getLocationDataFromIp(ipAddress);
     location = jsonDecode(location.body);
-    setState(() {});
   }
 
   Future<Map<String, dynamic>> _fetchWeatherData() async {
     final weatherService = GetIt.instance<WeatherService>();
     try {
-      if (location.isEmpty) {
-        await Future.delayed(const Duration(seconds: 5));
-      }
       final weatherData = await weatherService.fetchWeatherData(location);
       return weatherData;
     } catch (e) {
@@ -65,7 +60,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
       ),
       body: Center(
         child: FutureBuilder<Map<String, dynamic>>(
-          future: _fetchWeatherData(),
+          future: _fetchIpAddressAndLocation().then((locationData) {
+            return _fetchWeatherData();
+          }),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const CircularProgressIndicator(
