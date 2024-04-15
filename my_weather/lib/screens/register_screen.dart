@@ -100,7 +100,9 @@ class RegisterScreen extends StatelessWidget {
                   gravity: ToastGravity.BOTTOM,
                 );
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => LoginScreen(
+                          authService: GetIt.instance<AuthService>())),
                 );
               },
               child: const Text('Register'),

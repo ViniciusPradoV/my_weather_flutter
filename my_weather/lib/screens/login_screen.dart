@@ -5,9 +5,9 @@ import 'package:my_weather/services/auth.service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatelessWidget {
-  final AuthService authService = GetIt.instance<AuthService>();
+  final AuthService authService;
 
-  LoginScreen({super.key});
+   const LoginScreen({required this.authService, super.key});
 
   @override
   Widget build(BuildContext context) {

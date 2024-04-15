@@ -5,12 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   await setupDependencies();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-  final prefs = getIt<SharedPreferences>();
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
