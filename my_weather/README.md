@@ -1,6 +1,6 @@
 # my_weather
 
-A new Flutter project.
+A Flutter app that shows you current location weather statistics based on your IP.
 
 ## Getting Started
 
