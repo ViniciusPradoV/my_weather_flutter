@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:my_weather/services/geocoding.service.dart';
 import 'package:my_weather/services/ip.service.dart';
-import 'package:my_weather/services/weather.service.dart'; // Import your WeatherService
+import 'package:my_weather/services/weather.service.dart';
 
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
