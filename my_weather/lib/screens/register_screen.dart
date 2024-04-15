@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:my_weather/screens/weather_screen.dart';
+import 'package:my_weather/screens/login_screen.dart';
 import 'package:my_weather/services/auth.service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class LoginScreen extends StatelessWidget {
+class RegisterScreen extends StatelessWidget {
   final AuthService authService = GetIt.instance<AuthService>();
 
-  LoginScreen({super.key});
+  RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController usernameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Register'),
         backgroundColor: Colors.blue,
       ),
       body: Center(
@@ -30,12 +32,12 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Welcome to My Weather Login!',
+              'Welcome to My Weather Registration!',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Please enter your credentials to continue.',
+              'Please create your account.',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 24),
@@ -61,36 +63,47 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: 200,
+              child: TextFormField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () async {
-                final success = await authService.verifyUser(
-                    usernameController.text, passwordController.text);
-                if (success) {
+              onPressed: () {
+                final username = usernameController.text;
+                final password = passwordController.text;
+                final confirmPassword = confirmPasswordController.text;
+
+                if (password != confirmPassword) {
                   Fluttertoast.showToast(
-                    msg: 'Login successful!',
+                    msg: 'Passwords do not match',
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                  );
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const WeatherScreen()),
-                  );
-                } else {
-                  Fluttertoast.showToast(
-                    msg: 'Invalid username or password',
-                    toastLength: Toast.LENGTH_LONG,
-                    gravity: ToastGravity.BOTTOM,
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
                     webBgColor: 'RGB(255, 0, 0)',
+                    backgroundColor: const Color.fromARGB(255, 243, 65, 52),
                   );
+                  return;
                 }
+
+                authService.registerUser(username, password);
+                Fluttertoast.showToast(
+                  msg: 'User registered with success!',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                );
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               },
-              child: const Text('Login'),
+              child: const Text('Register'),
             ),
           ],
         ),

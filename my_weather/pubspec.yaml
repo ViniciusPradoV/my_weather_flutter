@@ -36,6 +36,7 @@ dependencies:
   get_it:
   font_awesome_flutter: 
   fluttertoast:
+  crypto:
 
 
   # The following adds the Cupertino Icons font to your application.

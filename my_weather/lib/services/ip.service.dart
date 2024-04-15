@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 class IpService {
@@ -11,7 +13,7 @@ class IpService {
           await _httpClient.get(Uri.parse('https://api.ipify.org?format=json'));
       if (response.statusCode == 200) {
         final ipAddress = response.body;
-        return ipAddress;
+        return jsonDecode(ipAddress)['ip'];
       } else {
         throw Exception('Failed to fetch IP address');
       }

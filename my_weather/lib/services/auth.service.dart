@@ -1,19 +1,25 @@
-import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class AuthService {
-  Future<bool> login(String username, String password) async {
-    if (username != '' && password != '') {
-      final prefs = GetIt.instance<SharedPreferences>();
-      await prefs.setString('auth_token', 'your_token_here');
+  final Map<String, String> _users = {};
+
+  Future<bool> registerUser(String username, String password) async {
+    if (username.isNotEmpty && password.isNotEmpty) {
+      final hashedPassword = sha256.convert(utf8.encode(password)).toString();
+      _users[username] = hashedPassword;
       return true;
     } else {
       return false;
     }
   }
 
-  Future<bool> checkLoginStatus() async {
-    final token = GetIt.instance<SharedPreferences>().getString('auth_token');
-    return token != null;
+  Future<bool> verifyUser(String username, String password) async {
+    if (_users.containsKey(username)) {
+      final hashedPassword = sha256.convert(utf8.encode(password)).toString();
+      return _users[username] == hashedPassword;
+    } else {
+      return false;
+    }
   }
 }
