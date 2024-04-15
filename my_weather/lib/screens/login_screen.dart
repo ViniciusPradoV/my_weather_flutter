@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:my_weather/screens/weather_screen.dart';
 import 'package:my_weather/services/auth.service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
